@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  poll-service:
+    build:
+      context: ./poll-service
+    ports:
+      - "3001:3001"
+    depends_on:
+      - mongo
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/polls
+
+  vote-service:
+    build:
+      context: ./vote-service
+    ports:
+      - "3002:3002"
+    depends_on:
+      - mongo
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/polls
+
+  result-service:
+    build:
+      context: ./result-service
+    ports:
+      - "3003:3003"
+    depends_on:
+      - mongo
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/polls
+
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  frontend:
+    build:
+      context: ./mypollproject
+    ports:
+      - "5000:5000"
+    depends_on:
+      - poll-service
+      - vote-service
+      - result-service
+
+volumes:
+  mongo-data:
